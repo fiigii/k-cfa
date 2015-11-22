@@ -9,7 +9,8 @@ import Control.Applicative ((<*>))
 
 type Label = Integer
 
-type Context = Map.Map String LAst
+type Context = [Label]
+type ContextEnvironment = Map.Map String Context
 
 data LAst = Var String Label
           | Function String LAst Label
@@ -22,7 +23,7 @@ data LAst = Var String Label
           | Unit Label
           | Number Integer Label
           | BinaryExpr String LAst LAst Label
-          | Closure LAst Context Label
+          | Closure LAst ContextEnvironment Label
           | List [LAst] Label
           | Car LAst Label
           | Cdr LAst Label
