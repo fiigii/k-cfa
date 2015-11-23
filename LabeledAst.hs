@@ -3,7 +3,7 @@ module LabeledAst where
 import qualified Ast as Ast
 import qualified Data.Map as Map
 import qualified Data.Set as Set
-import Data.Set (Set, union)
+import Data.Set (Set, union, delete, singleton, (\\))
 import Control.Monad.State
 import Control.Applicative ((<*>))
 
@@ -23,7 +23,7 @@ data LAst = Var String Label
           | Unit Label
           | Number Integer Label
           | BinaryExpr String LAst LAst Label
-          | Closure LAst ContextEnvironment Label
+          | Closure LAst ContextEnvironment
           | List [LAst] Label
           | Car LAst Label
           | Cdr LAst Label
@@ -123,6 +123,18 @@ allFunction (Application e1 e2 _) = allFunction e1 `union`
                                     allFunction e2
 allFunction _ = Set.empty
 
+fv :: LAst -> Set String
+fv (Function x body _) = delete x $ fv body
+fv (Var x _) = singleton x
+fv (LetRec binds body _) = let vars = Set.fromList $ map fst binds
+                               inits = map snd binds
+                           in fv body `union` Set.unions (map fv inits)
+                              \\ vars
+fv (IfExpr cond e1 e2 _) = fv cond `union` fv e1 `union` fv e2
+fv (BinaryExpr _ e1 e2 _) = fv e1 `union` fv e2
+fv (Application e1 e2 _) = fv e1 `union` fv e2
+fv _ = Set.empty
+
 labelOf :: LAst -> Label
 labelOf (Var _ l) = l
 labelOf (Function _ _ l) = l
@@ -147,6 +159,7 @@ instance Show LAst where
   show (Var v l) = v ++ addLable l
   show (Function v body l) = "function (" ++ v ++ ") {" ++
                              show body ++ "}" ++ addLable l
+  show (Closure f ce) = show f ++ " bind " ++ show (Map.toList ce)
   show (IfExpr cond e1 e2 l) = "if (" ++ show cond ++ ") {" ++
                                show e1 ++ "} else {" ++ show e2 ++
                                "}" ++ addLable l

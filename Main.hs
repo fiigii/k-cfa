@@ -6,6 +6,7 @@ import Parser
 import ControlFlow
 
 import qualified Data.Map as Map
+import qualified Data.Set as Set
 
 main :: IO ()
 main = withFile
@@ -13,15 +14,16 @@ main = withFile
        ReadMode
        (\handle -> do
            source <- hGetContents handle
-           -- putStrLn $ show $ jsparse source
-           let ((c, r), ast) = interpreter source
-           putStrLn $ "\nLabeled Program\n" ++ show ast
-           putStrLn "\nCache"
-           mapM_ (\(k, v) -> putStrLn $ show k ++ " -> " ++ show v) $ Map.toList c
-           putStrLn "\nEnvir"
-           mapM_ (\(k, v) -> putStrLn $ k ++ " -> " ++ show v)  $ Map.toList r
+           let ((cs, rs), ast) = interpreter source
+               c = Map.toList cs
+               r = Map.toList rs
+           putStrLn "Pragram: "
+           putStrLn $ show ast
+           putStrLn "\nControl Flow:"
+           mapM_ (\((Cache n ctx), v) -> putStrLn $ show n ++ " at " ++ show ctx ++ " : " ++ show (Set.toList v)) c
+           mapM_ (\((Envir n ctx), v) -> putStrLn $ show n ++ " at " ++ show ctx ++ " : " ++ show (Set.toList v)) r
        )
---interpreter :: String -> a
+
 interpreter source = case jsparse source of
                       Right ts -> (controlFlow ts, fst $ convert ts)
                       Left e -> error $ show e               

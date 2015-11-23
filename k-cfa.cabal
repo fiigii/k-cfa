@@ -20,5 +20,8 @@ executable k-cfa
   -- other-modules:       
   -- other-extensions:    
   build-depends:       base >=4.8 && <4.9
+                     , parsec
+                     , containers
+                     , mtl
   -- hs-source-dirs:      
   default-language:    Haskell2010
