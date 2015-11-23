@@ -2,6 +2,15 @@
 Context-sensitive control flow analysis (uniform k-CFA) for my Come
 language.
 
+#Principle
+<i>k</i>-CFA (ployvariant) is much more complicated than 0-CFA
+(monovariant) because there is no any information about how many
+varanits a function has, statically. Consequentially, the
+constraint-based <i>k</i>-CFA cannot generate all of the constraints
+then to solve them. I implement it as a demand-driven constraint
+generator/solver, which statically generates parts of constraints and
+solves them to get more constraints for closures.
+
 # Demo
 Program:
 ```

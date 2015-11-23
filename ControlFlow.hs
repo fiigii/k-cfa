@@ -131,7 +131,9 @@ buildResult (Incomplete p1 p2 p env cachedCalls: cs) processed e d w =
       tmp = map help closures
       processed' = Set.unions $ processed : map snd tmp
       newConstraints = Set.unions $ map fst tmp
-      (e', d', w') = buildEdge e d w $ Set.toList newConstraints
+      (concretes, subCondiIncom) = partition isConcrete $ Set.toList newConstraints
+      (tmpD, tmpW) = buildData d w concretes
+      (e', d', w') = buildEdge e tmpD tmpW subCondiIncom
   in buildResult cs processed' e' d' w'
 
 add :: Abstract -> Set LAst -> Map Abstract (Set LAst) -> [Abstract] -> (Map Abstract (Set LAst), [Abstract])
