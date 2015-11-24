@@ -1,5 +1,5 @@
 # <i>k</i>-CFA
-Context-sensitive control flow analysis (uniform k-CFA) for my Come
+Context-sensitive control flow analysis (uniform k-CFA) for my fJS
 language.
 
 #Principle
